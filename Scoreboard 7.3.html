@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cradley Heath Bowls Scoreboard V7.3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --bg-color: #0b3d0b;
+    --panel-bg: #145214;
+    --panel-border: #ffffff;
+    --text-color: #ffffff;
+    --score-bg: #ffffff;
+    --score-text: #000000;
+    --accent-color: #ffd700;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+    font-family: Arial, sans-serif;
+    background: radial-gradient(circle at top, #145214, #021902);
+    color: var(--text-color);
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* HEADER */
+header {
+    padding: 8px 12px;
+    background: #022502;
+    border-bottom: 2px solid var(--panel-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 { font-size: 1.3rem; }
+
+.controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.controls select,
+#tvModeBtn {
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--panel-border);
+    background: #0b3d0b;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+#tvModeBtn.active {
+    background: var(--accent-color);
+    color: #000;
+    font-weight: bold;
+}
+
+/* SETUP PANEL */
+#setupPanel {
+    background: #0b3d0b;
+    border-bottom: 2px solid var(--panel-border);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.setup-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.setup-row input {
+    flex: 1;
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid var(--panel-border);
+    background: #e8ffe8;
+    color: #000;
+}
+
+#hideSetupBtn, #showSetupBtn, #resetScoresBtn, #fullscreenBtn {
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--panel-border);
+    background: #145214;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+#showSetupBtn {
+    position: fixed;
+    top: 8px;
+    right: 8px;
+    display: none;
+    z-index: 1000;
+}
+
+/* MAIN */
+main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#gamesContainer {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+/* GAME BLOCKS */
+.game-block {
+    background: var(--panel-bg);
+    border: 2px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.game-title {
+    font-weight: bold;
+    font-size: 1rem;
+    color: var(--accent-color);
+    text-align: center;
+}
+
+.text-input {
+    width: 100%;
+    padding: 4px;
+    border-radius: 4px;
+    border: 1px solid var(--panel-border);
+    background: #e8ffe8;
+    color: #000;
+}
+
+.score-input {
+    width: 60px;
+    padding: 4px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 4px;
+    border: 1px solid var(--panel-border);
+    background: var(--score-bg);
+    color: var(--score-text);
+}
+
+.team-row {
+    display: grid;
+    grid-template-columns: 1.4fr 0.6fr;
+    gap: 6px;
+}
+
+/* TOTALS */
+#totalsBar {
+    border-top: 1px solid var(--panel-border);
+    padding-top: 6px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+/* INDICATOR */
+.section-indicator {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #dddddd;
+}
+
+/* INFO BUTTON */
+#infoButton {
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid var(--panel-border);
+    background: #0b3d0b;
+    color: var(--text-color);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#infoPanel {
+    position: fixed;
+    right: 10px;
+    bottom: 50px;
+    background: rgba(0,0,0,0.85);
+    color: #ffffff;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    max-width: 260px;
+    display: none;
+    border: 1px solid #ffffff;
+}
+
+/* NORMAL MULTI-COLUMN */
+@media (min-width: 900px) {
+    #gamesContainer { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1400px) {
+    #gamesContainer { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ============================================
+   CROWN GREEN SINGLES — MAX SIZE TV MODE
+   ============================================ */
+@media (min-width: 1000px) {
+
+    body.tv-6 #gamesContainer { grid-template-columns: repeat(3, 1fr); }
+    body.tv-8 #gamesContainer { grid-template-columns: repeat(4, 1fr); }
+    body.tv-10 #gamesContainer { grid-template-columns: repeat(5, 1fr); }
+
+    body.tv-6 .game-block,
+    body.tv-8 .game-block,
+    body.tv-10 .game-block {
+        padding: 32px;
+        border-width: 4px;
+        gap: 24px;
+    }
+
+    body.tv-6 .game-title,
+    body.tv-8 .game-title,
+    body.tv-10 .game-title {
+        font-size: 2.6rem;
+        margin-bottom: 14px;
+    }
+
+    body.tv-6 .text-input,
+    body.tv-8 .text-input,
+    body.tv-10 .text-input {
+        font-size: 2.2rem;
+        padding: 14px;
+        height: 70px;
+    }
+
+    body.tv-6 .score-input,
+    body.tv-8 .score-input,
+    body.tv-10 .score-input {
+        font-size: 4rem;
+        width: 150px;
+        height: 110px;
+        padding: 14px;
+    }
+
+    body.tv-6 #totalsBar,
+    body.tv-8 #totalsBar,
+    body.tv-10 #totalsBar {
+        font-size: 2.6rem;
+        padding: 18px 0;
+    }
+
+    body.tv-6 #sectionIndicator,
+    body.tv-8 #sectionIndicator,
+    body.tv-10 #sectionIndicator {
+        font-size: 1.8rem;
+        padding: 14px 0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Cradley Heath Bowls Scoreboard V7.3</h1>
+    <div class="controls">
+        <label for="matchType">Match Type:</label>
+        <select id="matchType">
+            <option value="6">6 Games</option>
+            <option value="8">8 Games</option>
+            <option value="10" selected>10 Games</option>
+        </select>
+
+        <button id="tvModeBtn">TV Mode</button>
+    </div>
+</header>
+
+<div id="setupPanel">
+    <div class="setup-row">
+        <label>Home Team:</label>
+        <input id="homeTeamInput" placeholder="Cradley Heath A">
+    </div>
+
+    <div class="setup-row">
+        <label>Away Team:</label>
+        <input id="awayTeamInput" placeholder="Away Team">
+    </div>
+
+    <div class="setup-row">
+        <button id="hideSetupBtn">Hide Setup</button>
+        <button id="resetScoresBtn">Reset All Scores</button>
+        <button id="fullscreenBtn">Full Screen</button>
+    </div>
+</div>
+
+<button id="showSetupBtn">Show Setup</button>
+
+<main>
+    <div id="gamesContainer"></div>
+    <div id="totalsBar">TOTALS | Home: 0    Away: 0</div>
+    <div class="section-indicator" id="sectionIndicator"></div>
+</main>
+
+<button id="infoButton">i</button>
+<div id="infoPanel">
+    <strong>Scoreboard V7.3</strong><br>
+    - Crown Green Singles Layout<br>
+    - Max‑Size TV Mode<br>
+    - Works on all screens<br>
+</div>
+
+<script>
+let allGames = [];
+let tvModeForced = false;
+
+const matchTypeSelect = document.getElementById("matchType");
+const gamesContainer = document.getElementById("gamesContainer");
+const totalsBar = document.getElementById("totalsBar");
+const sectionIndicator = document.getElementById("sectionIndicator");
+const homeTeamInput = document.getElementById("homeTeamInput");
+const awayTeamInput = document.getElementById("awayTeamInput");
+const hideSetupBtn = document.getElementById("hideSetupBtn");
+const showSetupBtn = document.getElementById("showSetupBtn");
+const resetScoresBtn = document.getElementById("resetScoresBtn");
+const fullscreenBtn = document.getElementById("fullscreenBtn");
+const setupPanel = document.getElementById("setupPanel");
+const infoButton = document.getElementById("infoButton");
+const infoPanel = document.getElementById("infoPanel");
+const tvModeBtn = document.getElementById("tvModeBtn");
+
+/* FULLSCREEN */
+function isIOSLikeSafari() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent);
+}
+function fullscreenEnabled() {
+    return !!document.fullscreenEnabled;
+}
+function isFullscreen() {
+    return !!document.fullscreenElement;
+}
+function requestFullscreen(el) {
+    if (el.requestFullscreen) el.requestFullscreen();
+}
+function exitFullscreen() {
+    if (document.exitFullscreen) document.exitFullscreen();
+}
+function updateFullscreenButton() {
+    if (isIOSLikeSafari() || !fullscreenEnabled()) {
+        fullscreenBtn.textContent = "Full Screen (N/A)";
+        fullscreenBtn.disabled = true;
+        return;
+    }
+    fullscreenBtn.textContent = isFullscreen() ? "Exit Full Screen" : "Full Screen";
+}
+
+/* GAME DATA */
+function createGameData(total) {
+    allGames = [];
+    for (let i = 1; i <= total; i++) {
+        allGames.push({ rink: i, homePlayers: "", awayPlayers: "", homeScore: "", awayScore: "" });
+    }
+}
+
+/* RENDER */
+function renderGames() {
+    gamesContainer.innerHTML = "";
+    allGames.forEach((g, index) => {
+        const block = document.createElement("div");
+        block.className = "game-block";
+        block.innerHTML = `
+            <div class="game-title">Game ${g.rink}</div>
+            <div class="team-row">
+                <input class="text-input" placeholder="Home player" value="${g.homePlayers}" data-index="${index}" data-field="homePlayers">
+                <input class="score-input" value="${g.homeScore}" data-index="${index}" data-field="homeScore">
+            </div>
+            <div class="team-row">
+                <input class="text-input" placeholder="Away player" value="${g.awayPlayers}" data-index="${index}" data-field="awayPlayers">
+                <input class="score-input" value="${g.awayScore}" data-index="${index}" data-field="awayScore">
+            </div>
+        `;
+        gamesContainer.appendChild(block);
+    });
+    attachInputListeners();
+}
+
+/* INPUT LISTENERS */
+function attachInputListeners() {
+    const inputs = gamesContainer.querySelectorAll("input");
+    inputs.forEach(input => {
+        input.addEventListener("input", e => {
+            const idx = parseInt(e.target.dataset.index);
+            const field = e.target.dataset.field;
+            allGames[idx][field] = e.target.value;
+            if (field.includes("Score")) updateTotals();
+        });
+    });
+}
+
+/* TOTALS */
+function updateTotals() {
+    let homeTotal = 0, awayTotal = 0;
+    allGames.forEach(g => {
+        const h = parseInt(g.homeScore);
+        const a = parseInt(g.awayScore);
+        if (!isNaN(h)) homeTotal += h;
+        if (!isNaN(a)) awayTotal += a;
+    });
+    totalsBar.innerHTML = `TOTALS | ${homeTeamInput.value || "Home"}: ${homeTotal}    ${awayTeamInput.value || "Away"}: ${awayTotal}`;
+}
+
+/* TV MODE */
+function applyTVModeAuto() {
+    document.body.classList.remove("tv-6", "tv-8", "tv-10");
+    const total = parseInt(matchTypeSelect.value);
+    if (window.innerWidth >= 1600 && window.innerHeight >= 900) {
+        if (total === 6) document.body.classList.add("tv-6");
+        if (total === 8) document.body.classList.add("tv-8");
+        if (total === 10) document.body.classList.add("tv-10");
+    }
+}
+
+function applyTVModeForced() {
+    document.body.classList.remove("tv-6", "tv-8", "tv-10");
+    const total = parseInt(matchTypeSelect.value);
+    if (total === 6) document.body.classList.add("tv-6");
+    if (total === 8) document.body.classList.add("tv-8");
+    if (total === 10) document.body.classList.add("tv-10");
+}
+
+/* LAYOUT */
+function updateLayout() {
+    renderGames();
+    updateTotals();
+    if (tvModeForced) applyTVModeForced();
+    else applyTVModeAuto();
+    updateFullscreenButton();
+}
+
+/* EVENTS */
+matchTypeSelect.addEventListener("change", () => {
+    createGameData(parseInt(matchTypeSelect.value));
+    updateLayout();
+});
+
+window.addEventListener("resize", updateLayout);
+
+hideSetupBtn.addEventListener("click", () => {
+    setupPanel.style.display = "none";
+    showSetupBtn.style.display = "block";
+});
+
+showSetupBtn.addEventListener("click", () => {
+    setupPanel.style.display = "flex";
+    showSetupBtn.style.display = "none";
+});
+
+resetScoresBtn.addEventListener("click", () => {
+    allGames.forEach(g => { g.homeScore = ""; g.awayScore = ""; });
+    updateLayout();
+});
+
+fullscreenBtn.addEventListener("click", () => {
+    if (isFullscreen()) exitFullscreen();
+    else requestFullscreen(document.documentElement);
+});
+
+tvModeBtn.addEventListener("click", () => {
+    tvModeForced = !tvModeForced;
+    tvModeBtn.classList.toggle("active", tvModeForced);
+    updateLayout();
+});
+
+infoButton.addEventListener("click", () => {
+    infoPanel.style.display = infoPanel.style.display === "block" ? "none" : "block";
+});
+
+document.addEventListener("click", e => {
+    if (!infoPanel.contains(e.target) && e.target !== infoButton) infoPanel.style.display = "none";
+});
+
+/* INIT */
+function init() {
+    createGameData(parseInt(matchTypeSelect.value));
+    updateLayout();
+}
+init();
+</script>
+
+</body>
+</html>
