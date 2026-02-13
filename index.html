@@ -41,13 +41,6 @@ header {
 
 header h1 { font-size: 1.3rem; }
 
-.controls {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.controls select,
 #tvModeBtn {
     padding: 6px 10px;
     border-radius: 4px;
@@ -79,7 +72,8 @@ header h1 { font-size: 1.3rem; }
     align-items: center;
 }
 
-.setup-row input {
+.setup-row input,
+.setup-row select {
     flex: 1;
     padding: 6px;
     border-radius: 4px;
@@ -174,13 +168,6 @@ main {
     font-size: 1rem;
 }
 
-/* INDICATOR */
-.section-indicator {
-    text-align: center;
-    font-size: 0.9rem;
-    color: #dddddd;
-}
-
 /* INFO BUTTON */
 #infoButton {
     position: fixed;
@@ -210,7 +197,7 @@ main {
     border: 1px solid #ffffff;
 }
 
-/* NORMAL MULTI-COLUMN */
+/* RESPONSIVE GRID */
 @media (min-width: 900px) {
     #gamesContainer { grid-template-columns: repeat(2, 1fr); }
 }
@@ -219,33 +206,26 @@ main {
     #gamesContainer { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* ============================================
-   CROWN GREEN SINGLES — TV MODE (REFINED)
-   ============================================ */
+/* TV MODE */
 @media (min-width: 1000px) {
-
     body.tv-6 #gamesContainer { grid-template-columns: repeat(3, 1fr); }
     body.tv-8 #gamesContainer { grid-template-columns: repeat(4, 1fr); }
-    body.tv-10 #gamesContainer { grid-template-columns: repeat(5, 1fr); }
 
     body.tv-6 .game-block,
-    body.tv-8 .game-block,
-    body.tv-10 .game-block {
+    body.tv-8 .game-block {
         padding: 24px;
         border-width: 4px;
         gap: 18px;
     }
 
     body.tv-6 .game-title,
-    body.tv-8 .game-title,
-    body.tv-10 .game-title {
+    body.tv-8 .game-title {
         font-size: 2.1rem;
         margin-bottom: 10px;
     }
 
     body.tv-6 .text-input,
-    body.tv-8 .text-input,
-    body.tv-10 .text-input {
+    body.tv-8 .text-input {
         font-size: 1.9rem;
         padding: 12px;
         height: 70px;
@@ -253,8 +233,7 @@ main {
     }
 
     body.tv-6 .score-input,
-    body.tv-8 .score-input,
-    body.tv-10 .score-input {
+    body.tv-8 .score-input {
         font-size: 3.2rem;
         width: 130px;
         height: 70px;
@@ -262,17 +241,9 @@ main {
     }
 
     body.tv-6 #totalsBar,
-    body.tv-8 #totalsBar,
-    body.tv-10 #totalsBar {
+    body.tv-8 #totalsBar {
         font-size: 2.2rem;
         padding: 14px 0;
-    }
-
-    body.tv-6 #sectionIndicator,
-    body.tv-8 #sectionIndicator,
-    body.tv-10 #sectionIndicator {
-        font-size: 1.5rem;
-        padding: 10px 0;
     }
 }
 </style>
@@ -281,20 +252,19 @@ main {
 <body>
 
 <header>
-    <h1>Cradley Heath Bowls Scoreboard V7.3</h1>
-    <div class="controls">
-        <label for="matchType">Match Type:</label>
-        <select id="matchType">
-            <option value="6">6 Games</option>
-            <option value="8">8 Games</option>
-            <option value="10" selected>10 Games</option>
-        </select>
-
-        <button id="tvModeBtn">TV Mode</button>
-    </div>
+    <h1>Cradley Heath Bowls Scoreboard V7.4</h1>
+    <button id="tvModeBtn">TV Mode</button>
 </header>
 
 <div id="setupPanel">
+    <div class="setup-row">
+        <label>Match Type:</label>
+        <select id="matchType">
+            <option value="6" selected>6 Games</option>
+            <option value="8">8 Games</option>
+        </select>
+    </div>
+
     <div class="setup-row">
         <label>Home Team:</label>
         <input id="homeTeamInput" placeholder="Cradley Heath A">
@@ -317,15 +287,14 @@ main {
 <main>
     <div id="gamesContainer"></div>
     <div id="totalsBar">TOTALS | Home: 0    Away: 0</div>
-    <div class="section-indicator" id="sectionIndicator"></div>
 </main>
 
 <button id="infoButton">i</button>
 <div id="infoPanel">
-    <strong>Scoreboard V7.3</strong><br>
-    - Crown Green Singles Layout<br>
-    - Refined TV Mode<br>
-    - Works on all screens<br>
+    <strong>Scoreboard V7.4</strong><br>
+    - 6/8 Game Selector<br>
+    - No Input Reset<br>
+    - TV Mode<br>
 </div>
 
 <script>
@@ -335,7 +304,6 @@ let tvModeForced = false;
 const matchTypeSelect = document.getElementById("matchType");
 const gamesContainer = document.getElementById("gamesContainer");
 const totalsBar = document.getElementById("totalsBar");
-const sectionIndicator = document.getElementById("sectionIndicator");
 const homeTeamInput = document.getElementById("homeTeamInput");
 const awayTeamInput = document.getElementById("awayTeamInput");
 const hideSetupBtn = document.getElementById("hideSetupBtn");
@@ -347,31 +315,6 @@ const infoButton = document.getElementById("infoButton");
 const infoPanel = document.getElementById("infoPanel");
 const tvModeBtn = document.getElementById("tvModeBtn");
 
-/* FULLSCREEN */
-function isIOSLikeSafari() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent);
-}
-function fullscreenEnabled() {
-    return !!document.fullscreenEnabled;
-}
-function isFullscreen() {
-    return !!document.fullscreenElement;
-}
-function requestFullscreen(el) {
-    if (el.requestFullscreen) el.requestFullscreen();
-}
-function exitFullscreen() {
-    if (document.exitFullscreen) document.exitFullscreen();
-}
-function updateFullscreenButton() {
-    if (isIOSLikeSafari() || !fullscreenEnabled()) {
-        fullscreenBtn.textContent = "Full Screen (N/A)";
-        fullscreenBtn.disabled = true;
-        return;
-    }
-    fullscreenBtn.textContent = isFullscreen() ? "Exit Full Screen" : "Full Screen";
-}
-
 /* GAME DATA */
 function createGameData(total) {
     allGames = [];
@@ -380,8 +323,8 @@ function createGameData(total) {
     }
 }
 
-/* RENDER */
-function renderGames() {
+/* RENDER ONCE */
+function renderGamesOnce() {
     gamesContainer.innerHTML = "";
     allGames.forEach((g, index) => {
         const block = document.createElement("div");
@@ -389,16 +332,17 @@ function renderGames() {
         block.innerHTML = `
             <div class="game-title">Game ${g.rink}</div>
             <div class="team-row">
-                <input class="text-input" placeholder="Home player" value="${g.homePlayers}" data-index="${index}" data-field="homePlayers">
-                <input type="number" inputmode="numeric" class="score-input" value="${g.homeScore}" data-index="${index}" data-field="homeScore">
+                <input class="text-input" placeholder="Home player" data-index="${index}" data-field="homePlayers">
+                <input type="number" inputmode="numeric" class="score-input" data-index="${index}" data-field="homeScore">
             </div>
             <div class="team-row">
-                <input class="text-input" placeholder="Away player" value="${g.awayPlayers}" data-index="${index}" data-field="awayPlayers">
-                <input type="number" inputmode="numeric" class="score-input" value="${g.awayScore}" data-index="${index}" data-field="awayScore">
+                <input class="text-input" placeholder="Away player" data-index="${index}" data-field="awayPlayers">
+                <input type="number" inputmode="numeric" class="score-input" data-index="${index}" data-field="awayScore">
             </div>
         `;
         gamesContainer.appendChild(block);
     });
+
     attachInputListeners();
 }
 
@@ -428,40 +372,22 @@ function updateTotals() {
 }
 
 /* TV MODE */
-function applyTVModeAuto() {
-    document.body.classList.remove("tv-6", "tv-8", "tv-10");
+function applyTVMode() {
+    document.body.classList.remove("tv-6", "tv-8");
     const total = parseInt(matchTypeSelect.value);
-    if (window.innerWidth >= 1600 && window.innerHeight >= 900) {
+    if (tvModeForced) {
         if (total === 6) document.body.classList.add("tv-6");
         if (total === 8) document.body.classList.add("tv-8");
-        if (total === 10) document.body.classList.add("tv-10");
     }
-}
-
-function applyTVModeForced() {
-    document.body.classList.remove("tv-6", "tv-8", "tv-10");
-    const total = parseInt(matchTypeSelect.value);
-    if (total === 6) document.body.classList.add("tv-6");
-    if (total === 8) document.body.classList.add("tv-8");
-    if (total === 10) document.body.classList.add("tv-10");
-}
-
-/* LAYOUT */
-function updateLayout() {
-    renderGames();
-    updateTotals();
-    if (tvModeForced) applyTVModeForced();
-    else applyTVModeAuto();
-    updateFullscreenButton();
 }
 
 /* EVENTS */
 matchTypeSelect.addEventListener("change", () => {
     createGameData(parseInt(matchTypeSelect.value));
-    updateLayout();
+    renderGamesOnce();
+    updateTotals();
+    applyTVMode();
 });
-
-window.addEventListener("resize", updateLayout);
 
 hideSetupBtn.addEventListener("click", () => {
     setupPanel.style.display = "none";
@@ -475,18 +401,15 @@ showSetupBtn.addEventListener("click", () => {
 
 resetScoresBtn.addEventListener("click", () => {
     allGames.forEach(g => { g.homeScore = ""; g.awayScore = ""; });
-    updateLayout();
-});
-
-fullscreenBtn.addEventListener("click", () => {
-    if (isFullscreen()) exitFullscreen();
-    else requestFullscreen(document.documentElement);
+    const scoreInputs = gamesContainer.querySelectorAll(".score-input");
+    scoreInputs.forEach(i => i.value = "");
+    updateTotals();
 });
 
 tvModeBtn.addEventListener("click", () => {
     tvModeForced = !tvModeForced;
     tvModeBtn.classList.toggle("active", tvModeForced);
-    updateLayout();
+    applyTVMode();
 });
 
 infoButton.addEventListener("click", () => {
@@ -499,11 +422,13 @@ document.addEventListener("click", e => {
 
 /* INIT */
 function init() {
-    createGameData(parseInt(matchTypeSelect.value));
-    updateLayout();
+    createGameData(6);
+    renderGamesOnce();
+    updateTotals();
 }
 init();
 </script>
 
 </body>
 </html>
+
