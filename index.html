@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cradley Heath Bowls Scoreboard V7.3</title>
+    <title>Cradley Heath Bowls Scoreboard V7.4</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -390,11 +390,11 @@ function renderGames() {
             <div class="game-title">Game ${g.rink}</div>
             <div class="team-row">
                 <input class="text-input" placeholder="Home player" value="${g.homePlayers}" data-index="${index}" data-field="homePlayers">
-                <input class="score-input" value="${g.homeScore}" data-index="${index}" data-field="homeScore">
+                <input type="number" inputmode="numeric" class="score-input" value="${g.homeScore}" data-index="${index}" data-field="homeScore">
             </div>
             <div class="team-row">
                 <input class="text-input" placeholder="Away player" value="${g.awayPlayers}" data-index="${index}" data-field="awayPlayers">
-                <input class="score-input" value="${g.awayScore}" data-index="${index}" data-field="awayScore">
+                <input type="number" inputmode="numeric" class="score-input" value="${g.awayScore}" data-index="${index}" data-field="awayScore">
             </div>
         `;
         gamesContainer.appendChild(block);
