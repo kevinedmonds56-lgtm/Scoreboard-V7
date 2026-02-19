@@ -222,7 +222,34 @@ main {
 @media (min-width: 1400px) {
     #gamesContainer { grid-template-columns: repeat(3, 1fr); }
 }
+/* PATCH 5 START - Mobile height optimisation */
+@media (max-width: 600px) {
 
+    header {
+        padding: 4px 8px;
+    }
+
+    .game-block {
+        padding: 6px;
+        gap: 4px;
+    }
+
+    .text-input,
+    .score-input {
+        padding: 3px;
+    }
+
+    #totalsBar {
+        padding-top: 2px;
+        font-size: 0.9rem;
+    }
+
+    main {
+        padding: 4px;
+        gap: 4px;
+    }
+}
+/* PATCH 5 END - Mobile height optimisation */
 /* TV MODE */
 /* PATCH 3 START - Improved TV mode behaviour */
 @media (min-width: 1000px) {
@@ -484,3 +511,4 @@ init();
 
 </body>
 </html>
+
