@@ -1,8 +1,9 @@
+<!-- BLOCK 1 / 2 : FULL V7.4.3 SCOREBOARD (HTML + CSS + START OF JS) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cradley Heath Bowls Scoreboard V7.4.0</title>
+    <title>Cradley Heath Bowls Scoreboard V7.4.3</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -29,7 +30,7 @@ body {
     flex-direction: column;
 }
 
-/* HEADER */
+/* PATCH 4 START - Header layout improvements */
 header {
     padding: 8px 12px;
     background: #022502;
@@ -37,9 +38,20 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
 }
 
-header h1 { font-size: 1.3rem; }
+header h1 {
+    font-size: 1.25rem;
+    white-space: nowrap;
+}
+
+header .header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
 
 #tvModeBtn {
     padding: 6px 10px;
@@ -55,6 +67,7 @@ header h1 { font-size: 1.3rem; }
     color: #000;
     font-weight: bold;
 }
+/* PATCH 4 END - Header layout improvements */
 
 /* SETUP PANEL */
 #setupPanel {
@@ -70,6 +83,10 @@ header h1 { font-size: 1.3rem; }
     display: flex;
     gap: 10px;
     align-items: center;
+}
+
+.setup-row label {
+    min-width: 90px;
 }
 
 .setup-row input,
@@ -207,6 +224,7 @@ main {
 }
 
 /* TV MODE */
+/* PATCH 3 START - Improved TV mode behaviour */
 @media (min-width: 1000px) {
     body.tv-6 #gamesContainer { grid-template-columns: repeat(3, 1fr); }
     body.tv-8 #gamesContainer { grid-template-columns: repeat(4, 1fr); }
@@ -246,14 +264,17 @@ main {
         padding: 14px 0;
     }
 }
+/* PATCH 3 END - Improved TV mode behaviour */
 </style>
 </head>
 
 <body>
 
 <header>
-    <h1>Cradley Heath Bowls Scoreboard V7.4.0</h1>
-    <button id="tvModeBtn">TV Mode</button>
+    <h1>Cradley Heath Bowls Scoreboard V7.4.3</h1>
+    <div class="header-right">
+        <button id="tvModeBtn">TV Mode</button>
+    </div>
 </header>
 
 <div id="setupPanel">
@@ -291,9 +312,9 @@ main {
 
 <button id="infoButton">i</button>
 <div id="infoPanel">
-    <strong>Scoreboard V7.4.0</strong><br>
+    <strong>Scoreboard V7.4.3</strong><br>
     - 6/8 Game Selector<br>
-    - No Input Reset<br>
+    - No Input Reset on Team Names<br>
     - TV Mode<br>
 </div>
 
@@ -343,9 +364,13 @@ function renderGamesOnce() {
         gamesContainer.appendChild(block);
     });
 
-    attachInputListeners();
+   attachInputListeners();
 }
+</script>
 
+<!-- BLOCK 2 / 2 : FULL V7.4.3 SCOREBOARD (REMAINDER OF JS + CLOSING TAGS) -->
+
+<script>
 /* INPUT LISTENERS */
 function attachInputListeners() {
     const inputs = gamesContainer.querySelectorAll("input");
@@ -354,7 +379,7 @@ function attachInputListeners() {
             const idx = parseInt(e.target.dataset.index);
             const field = e.target.dataset.field;
             allGames[idx][field] = e.target.value;
-            if (field.includes("Score")) updateTotals();
+            if (field && field.includes("Score")) updateTotals();
         });
     });
 }
@@ -372,6 +397,7 @@ function updateTotals() {
 }
 
 /* TV MODE */
+/* PATCH 3 START - Improved TV mode behaviour */
 function applyTVMode() {
     document.body.classList.remove("tv-6", "tv-8");
     const total = parseInt(matchTypeSelect.value);
@@ -380,14 +406,24 @@ function applyTVMode() {
         if (total === 8) document.body.classList.add("tv-8");
     }
 }
+/* PATCH 3 END - Improved TV mode behaviour */
 
 /* EVENTS */
+
+/* PATCH 2 START - Match type change resets all inputs except team names */
 matchTypeSelect.addEventListener("change", () => {
-    createGameData(parseInt(matchTypeSelect.value));
+    // Rebuild all games fresh (player names + scores cleared)
+    const total = parseInt(matchTypeSelect.value);
+    createGameData(total);
     renderGamesOnce();
+
+    // Reset totals to 0 for new layout
     updateTotals();
+
+    // Re-apply TV mode for the new match type
     applyTVMode();
 });
+/* PATCH 2 END - Match type change resets all inputs except team names */
 
 hideSetupBtn.addEventListener("click", () => {
     setupPanel.style.display = "none";
@@ -400,10 +436,21 @@ showSetupBtn.addEventListener("click", () => {
 });
 
 resetScoresBtn.addEventListener("click", () => {
-    allGames.forEach(g => { g.homeScore = ""; g.awayScore = ""; });
+    allGames.forEach(g => { g.homeScore = ""; g.awayScore = ""; g.homePlayers = ""; g.awayPlayers = ""; });
     const scoreInputs = gamesContainer.querySelectorAll(".score-input");
+    const textInputs = gamesContainer.querySelectorAll(".text-input");
     scoreInputs.forEach(i => i.value = "");
+    textInputs.forEach(i => i.value = "");
     updateTotals();
+});
+
+/* Optional: Fullscreen button (kept simple and non-critical) */
+fullscreenBtn.addEventListener("click", () => {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+        document.exitFullscreen().catch(() => {});
+    }
 });
 
 tvModeBtn.addEventListener("click", () => {
@@ -420,16 +467,20 @@ document.addEventListener("click", e => {
     if (!infoPanel.contains(e.target) && e.target !== infoButton) infoPanel.style.display = "none";
 });
 
+/* PATCH 1 START - Live team name updates */
+homeTeamInput.addEventListener("input", updateTotals);
+awayTeamInput.addEventListener("input", updateTotals);
+/* PATCH 1 END - Live team name updates */
+
 /* INIT */
 function init() {
     createGameData(6);
     renderGamesOnce();
     updateTotals();
+    applyTVMode();
 }
 init();
 </script>
 
 </body>
 </html>
-
-
