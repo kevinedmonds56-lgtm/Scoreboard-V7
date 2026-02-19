@@ -1,9 +1,9 @@
-<!-- BLOCK 1 / 2 : FULL V7.4.3 SCOREBOARD (HTML + CSS + START OF JS) -->
+<!-- BLOCK 1 / 2 : FULL V7.5 SCOREBOARD (HTML + CSS + START OF JS) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cradley Heath Bowls Scoreboard V7.4.3</title>
+    <title>Cradley Heath Bowls Scoreboard V7.5.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -222,9 +222,9 @@ main {
 @media (min-width: 1400px) {
     #gamesContainer { grid-template-columns: repeat(3, 1fr); }
 }
+
 /* PATCH 5 START - Mobile height optimisation */
 @media (max-width: 600px) {
-
     header {
         padding: 4px 8px;
     }
@@ -250,6 +250,7 @@ main {
     }
 }
 /* PATCH 5 END - Mobile height optimisation */
+
 /* TV MODE */
 /* PATCH 3 START - Improved TV mode behaviour */
 @media (min-width: 1000px) {
@@ -298,7 +299,7 @@ main {
 <body>
 
 <header>
-    <h1>Cradley Heath Bowls Scoreboard V7.4.3</h1>
+    <h1>Cradley Heath Bowls Scoreboard V7.5.0</h1>
     <div class="header-right">
         <button id="tvModeBtn">TV Mode</button>
     </div>
@@ -339,9 +340,9 @@ main {
 
 <button id="infoButton">i</button>
 <div id="infoPanel">
-    <strong>Scoreboard V7.4.3</strong><br>
+    <strong>Scoreboard V7.5.0</strong><br>
     - 6/8 Game Selector<br>
-    - No Input Reset on Team Names<br>
+    - Local Save & Restore<br>
     - TV Mode<br>
 </div>
 
@@ -362,6 +363,8 @@ const setupPanel = document.getElementById("setupPanel");
 const infoButton = document.getElementById("infoButton");
 const infoPanel = document.getElementById("infoPanel");
 const tvModeBtn = document.getElementById("tvModeBtn");
+
+const STORAGE_KEY = "chb_scoreboard_v75";
 
 /* GAME DATA */
 function createGameData(total) {
@@ -391,13 +394,77 @@ function renderGamesOnce() {
         gamesContainer.appendChild(block);
     });
 
-   attachInputListeners();
+    attachInputListeners();
 }
-</script>
 
-<!-- BLOCK 2 / 2 : FULL V7.4.3 SCOREBOARD (REMAINDER OF JS + CLOSING TAGS) -->
+/* PATCH 6 START - Save state to localStorage */
+function saveState() {
+    const state = {
+        matchType: matchTypeSelect.value,
+        homeTeam: homeTeamInput.value,
+        awayTeam: awayTeamInput.value,
+        games: allGames,
+        tvModeForced: tvModeForced
+    };
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+        // ignore storage errors
+    }
+}
+/* PATCH 6 END - Save state to localStorage */
 
-<script>
+/* PATCH 7 START - Load state from localStorage */
+function loadState() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const state = JSON.parse(raw);
+        if (!state || !Array.isArray(state.games) || state.games.length === 0) return;
+
+        const total = state.games.length;
+        matchTypeSelect.value = state.matchType === "8" ? "8" : "6";
+
+        createGameData(total);
+        for (let i = 0; i < allGames.length; i++) {
+            if (state.games[i]) {
+                allGames[i] = {
+                    rink: allGames[i].rink,
+                    homePlayers: state.games[i].homePlayers || "",
+                    awayPlayers: state.games[i].awayPlayers || "",
+                    homeScore: state.games[i].homeScore || "",
+                    awayScore: state.games[i].awayScore || ""
+                };
+            }
+        }
+
+        renderGamesOnce();
+
+        homeTeamInput.value = state.homeTeam || "";
+        awayTeamInput.value = state.awayTeam || "";
+
+        tvModeForced = !!state.tvModeForced;
+        tvModeBtn.classList.toggle("active", tvModeForced);
+        applyTVMode();
+
+        allGames.forEach((g, index) => {
+            const homeP = gamesContainer.querySelector(`input[data-index="${index}"][data-field="homePlayers"]`);
+            const awayP = gamesContainer.querySelector(`input[data-index="${index}"][data-field="awayPlayers"]`);
+            const homeS = gamesContainer.querySelector(`input[data-index="${index}"][data-field="homeScore"]`);
+            const awayS = gamesContainer.querySelector(`input[data-index="${index}"][data-field="awayScore"]`);
+            if (homeP) homeP.value = g.homePlayers || "";
+            if (awayP) awayP.value = g.awayPlayers || "";
+            if (homeS) homeS.value = g.homeScore || "";
+            if (awayS) awayS.value = g.awayScore || "";
+        });
+
+        updateTotals();
+    } catch (e) {
+        // ignore parse errors
+    }
+}
+/* PATCH 7 END - Load state from localStorage */
+
 /* INPUT LISTENERS */
 function attachInputListeners() {
     const inputs = gamesContainer.querySelectorAll("input");
@@ -405,8 +472,11 @@ function attachInputListeners() {
         input.addEventListener("input", e => {
             const idx = parseInt(e.target.dataset.index);
             const field = e.target.dataset.field;
-            allGames[idx][field] = e.target.value;
+            if (!isNaN(idx) && field && allGames[idx]) {
+                allGames[idx][field] = e.target.value;
+            }
             if (field && field.includes("Score")) updateTotals();
+            saveState();
         });
     });
 }
@@ -437,20 +507,16 @@ function applyTVMode() {
 
 /* EVENTS */
 
-/* PATCH 2 START - Match type change resets all inputs except team names */
+/* PATCH 2 START - Match type change resets all inputs except team names, with save */
 matchTypeSelect.addEventListener("change", () => {
-    // Rebuild all games fresh (player names + scores cleared)
     const total = parseInt(matchTypeSelect.value);
     createGameData(total);
     renderGamesOnce();
-
-    // Reset totals to 0 for new layout
     updateTotals();
-
-    // Re-apply TV mode for the new match type
     applyTVMode();
+    saveState();
 });
-/* PATCH 2 END - Match type change resets all inputs except team names */
+/* PATCH 2 END - Match type change resets all inputs except team names, with save */
 
 hideSetupBtn.addEventListener("click", () => {
     setupPanel.style.display = "none";
@@ -469,9 +535,10 @@ resetScoresBtn.addEventListener("click", () => {
     scoreInputs.forEach(i => i.value = "");
     textInputs.forEach(i => i.value = "");
     updateTotals();
+    saveState();
 });
 
-/* Optional: Fullscreen button (kept simple and non-critical) */
+/* Optional: Fullscreen button */
 fullscreenBtn.addEventListener("click", () => {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(() => {});
@@ -484,6 +551,7 @@ tvModeBtn.addEventListener("click", () => {
     tvModeForced = !tvModeForced;
     tvModeBtn.classList.toggle("active", tvModeForced);
     applyTVMode();
+    saveState();
 });
 
 infoButton.addEventListener("click", () => {
@@ -494,21 +562,26 @@ document.addEventListener("click", e => {
     if (!infoPanel.contains(e.target) && e.target !== infoButton) infoPanel.style.display = "none";
 });
 
-/* PATCH 1 START - Live team name updates */
-homeTeamInput.addEventListener("input", updateTotals);
-awayTeamInput.addEventListener("input", updateTotals);
-/* PATCH 1 END - Live team name updates */
+/* PATCH 1 START - Live team name updates + save */
+homeTeamInput.addEventListener("input", () => {
+    updateTotals();
+    saveState();
+});
+awayTeamInput.addEventListener("input", () => {
+    updateTotals();
+    saveState();
+});
+/* PATCH 1 END - Live team name updates + save */
 
 /* INIT */
 function init() {
     createGameData(6);
     renderGamesOnce();
+    loadState();
     updateTotals();
     applyTVMode();
 }
 init();
 </script>
-
 </body>
 </html>
-
