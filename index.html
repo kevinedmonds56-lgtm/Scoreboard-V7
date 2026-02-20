@@ -2,160 +2,108 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cradley Heath Bowls Scoreboard V7.5.2</title>
+    <title>Cradley Heath Bowls Scoreboard V7.5.3</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 :root {
-    --bg-color: #0b3d0b;
-    --panel-bg: #145214;
-    --panel-border: #ffffff;
-    --text-color: #ffffff;
-    --score-bg: #ffffff;
-    --score-text: #000000;
-    --accent-color: #ffd700;
+    --panel-border: #ffff00;
+    --accent-color: #ffff00;
 }
 
 /* Base reset */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
 
+/* HIGH‑VIS ALWAYS ON */
 body {
     font-family: Arial, sans-serif;
-    background: radial-gradient(circle at top, #145214, #021902);
-    color: var(--text-color);
+    background: #000000;
+    color: #ffff00;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-
-    /* PATCH 7.5.1 – allow vertical scroll if needed */
     overflow-y: auto;
     overflow-x: hidden;
 }
 
-/* PATCH 7.5.1 – ensure scroll on short viewports */
-@media (max-height: 750px) {
-    body {
-        overflow-y: auto;
-    }
-}
-
 /* Header */
 header {
-    padding: 8px 12px;
-    background: #022502;
+    padding: 4px 6px;
+    background: #001900;
     border-bottom: 2px solid var(--panel-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
 }
 
 header h1 {
-    font-size: 1.25rem;
+    font-size: 1.05rem;
     white-space: nowrap;
 }
 
-header .header-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-header button {
-    padding: 6px 10px;
-    border-radius: 4px;
-    border: 1px solid var(--panel-border);
-    background: #0b3d0b;
-    color: var(--text-color);
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-header button.active {
-    background: var(--accent-color);
-    color: #000;
-    font-weight: bold;
-}
+/* Remove High‑Vis button */
+#hiVisBtn { display: none !important; }
 
 /* Setup Panel */
 #setupPanel {
-    background: #0b3d0b;
+    background: #002200;
     border-bottom: 2px solid var(--panel-border);
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.setup-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.setup-row label {
-    min-width: 90px;
-    font-weight: 600;
-}
-
-.setup-row input,
-.setup-row select {
-    flex: 1;
     padding: 6px;
-    border-radius: 4px;
-    border: 1px solid var(--panel-border);
-    background: #e8ffe8;
-    color: #000;
-}
-
-/* PATCH 7.5.2 – larger, clearer team name inputs */
-#homeTeamInput,
-#awayTeamInput {
-    font-size: 1.1rem;
-    font-weight: 600;
-}
-
-#hideSetupBtn, #showSetupBtn, #resetScoresBtn, #fullscreenBtn {
-    padding: 6px 10px;
-    border-radius: 4px;
-    border: 1px solid var(--panel-border);
-    background: #145214;
-    color: var(--text-color);
-    cursor: pointer;
-}
-
-#showSetupBtn {
-    position: fixed;
-    top: 8px;
-    right: 8px;
-    display: none;
-    z-index: 1000;
-}
-
-/* Main */
-main {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px;
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
 
+.setup-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.setup-row label {
+    min-width: 70px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.setup-row input,
+.setup-row select {
+    flex: 1;
+    padding: 4px;
+    border-radius: 4px;
+    border: 1px solid var(--panel-border);
+    background: #ffffff;
+    color: #000000;
+    font-size: 0.9rem;
+}
+
+/* Main */
+main {
+    flex: 1;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 6px;
+    gap: 6px;
+}
+
 #gamesContainer {
+    flex: 1;
+    overflow-y: auto;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 6px;
+    padding-right: 4px;
 }
 
 /* Game Blocks */
 .game-block {
-    background: var(--panel-bg);
+    background: #003300;
     border: 2px solid var(--panel-border);
     border-radius: 6px;
-    padding: 10px;
+    padding: 8px;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -166,32 +114,31 @@ main {
     font-size: 1rem;
     color: var(--accent-color);
     text-align: center;
+    text-shadow: 0 0 4px #000;
 }
 
-/* PATCH 7.5.2 – larger text inside player boxes */
+/* Inputs */
 .text-input {
     width: 100%;
     padding: 4px;
     border-radius: 4px;
     border: 1px solid var(--panel-border);
-    background: #e8ffe8;
-    color: #000;
+    background: #ffffff;
+    color: #000000;
     font-size: 1.05rem;
-    line-height: 1.2;
+    font-weight: 600;
 }
 
-/* PATCH 7.5.2 – larger, bolder scores */
 .score-input {
     width: 60px;
     padding: 4px;
     font-size: 1.35rem;
-    font-weight: bold;
+    font-weight: 700;
     text-align: center;
     border-radius: 4px;
-    border: 1px solid var(--panel-border);
-    background: var(--score-bg);
-    color: var(--score-text);
-    line-height: 1.2;
+    border: 1px solid red;
+    background: #ffffff;
+    color: #000000;
 }
 
 .team-row {
@@ -203,10 +150,11 @@ main {
 /* Totals */
 #totalsBar {
     border-top: 1px solid var(--panel-border);
-    padding-top: 6px;
+    padding-top: 4px;
     text-align: center;
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #ffff00;
 }
 
 /* Info Button */
@@ -218,8 +166,8 @@ main {
     height: 34px;
     border-radius: 50%;
     border: 2px solid var(--panel-border);
-    background: #0b3d0b;
-    color: var(--text-color);
+    background: #001900;
+    color: #ffff00;
     font-weight: bold;
     cursor: pointer;
 }
@@ -228,14 +176,14 @@ main {
     position: fixed;
     right: 10px;
     bottom: 50px;
-    background: rgba(0,0,0,0.85);
-    color: #ffffff;
+    background: #000000;
+    color: #ffff00;
     padding: 10px 12px;
     border-radius: 6px;
     font-size: 0.9rem;
     max-width: 260px;
     display: none;
-    border: 1px solid #ffffff;
+    border: 1px solid #ffff00;
 }
 
 /* Responsive Grid */
@@ -245,15 +193,6 @@ main {
 
 @media (min-width: 1400px) {
     #gamesContainer { grid-template-columns: repeat(3, 1fr); }
-}
-
-/* Mobile optimisation */
-@media (max-width: 600px) {
-    header { padding: 4px 8px; }
-    .game-block { padding: 6px; gap: 4px; }
-    .text-input, .score-input { padding: 3px; }
-    #totalsBar { padding-top: 2px; font-size: 0.9rem; }
-    main { padding: 4px; gap: 4px; }
 }
 
 /* TV Mode */
@@ -296,115 +235,14 @@ main {
         padding: 14px 0;
     }
 }
-
-/* HIGH VISIBILITY MODE */
-body.high-vis {
-    background: #000000;
-}
-
-body.high-vis .game-block {
-    background: #003300;
-    border-color: #ffff00;
-}
-
-body.high-vis .game-title {
-    color: #ffff00;
-    text-shadow: 0 0 4px #000;
-}
-
-body.high-vis .text-input {
-    background: #ffffff;
-    color: #000000;
-    border-color: #ffff00;
-    font-weight: 600;
-}
-
-body.high-vis .score-input {
-    background: #ffffff;
-    color: #000000;
-    border-color: #ff0000;
-    font-weight: 700;
-}
-
-body.high-vis #totalsBar {
-    color: #ffff00;
-    font-weight: 700;
-}
-
-body.high-vis header {
-    background: #001900;
-}
-
-body.high-vis #setupPanel {
-    background: #002200;
-}
-
-body.high-vis #infoPanel {
-    background: #000000;
-    border-color: #ffff00;
-}
-
-/* ---------------------------------------------------------
-   PATCH 7.5.2a — Mobile Header Compression
---------------------------------------------------------- */
-@media (max-width: 600px) {
-
-    header {
-        padding: 4px 6px;
-        gap: 6px;
-    }
-
-    header h1 {
-        font-size: 1rem;
-    }
-
-    header .header-right button {
-        padding: 4px 6px;
-        font-size: 0.75rem;
-    }
-
-    #setupPanel {
-        padding: 6px;
-        gap: 6px;
-    }
-
-    .setup-row label {
-        min-width: 70px;
-        font-size: 0.85rem;
-    }
-
-    .setup-row input,
-    .setup-row select {
-        padding: 4px;
-        font-size: 0.9rem;
-    }
-}
-/* ---------------------------------------------------------
-   PATCH 7.5.2b — Independent Game List Scrolling
-   Ensures 6 games always fit by allowing only the game list
-   to scroll, not the whole page.
---------------------------------------------------------- */
-
-main {
-    flex: 1;
-    overflow-y: hidden; /* stop whole page scrolling */
-    display: flex;
-    flex-direction: column;
-}
-
-#gamesContainer {
-    flex: 1;
-    overflow-y: auto;   /* scroll only the games */
-    padding-right: 4px; /* avoid clipping on iPhone */
-}
 </style>
 </head>
+
 <body>
 
 <header>
-    <h1>Cradley Heath Bowls Scoreboard V7.5.2</h1>
+    <h1>Cradley Heath Bowls Scoreboard V7.5.3</h1>
     <div class="header-right">
-        <button id="hiVisBtn">High Vis</button>
         <button id="tvModeBtn">TV Mode</button>
     </div>
 </header>
@@ -444,17 +282,16 @@ main {
 
 <button id="infoButton">i</button>
 <div id="infoPanel">
-    <strong>Scoreboard V7.5.2</strong><br>
+    <strong>Scoreboard V7.5.3</strong><br>
+    - High‑Vis Always On<br>
     - 6/8 Game Selector<br>
     - Local Save & Restore<br>
     - TV Mode<br>
-    - High Visibility Mode<br>
 </div>
 
 <script>
 let allGames = [];
 let tvModeForced = false;
-let hiVisForced = false;
 
 const matchTypeSelect = document.getElementById("matchType");
 const gamesContainer = document.getElementById("gamesContainer");
@@ -469,9 +306,8 @@ const setupPanel = document.getElementById("setupPanel");
 const infoButton = document.getElementById("infoButton");
 const infoPanel = document.getElementById("infoPanel");
 const tvModeBtn = document.getElementById("tvModeBtn");
-const hiVisBtn = document.getElementById("hiVisBtn");
 
-const STORAGE_KEY = "chb_scoreboard_v75_2";
+const STORAGE_KEY = "chb_scoreboard_v75_3";
 
 /* GAME DATA */
 function createGameData(total) {
@@ -481,7 +317,7 @@ function createGameData(total) {
     }
 }
 
-/* RENDER ONCE */
+/* RENDER GAMES */
 function renderGamesOnce() {
     gamesContainer.innerHTML = "";
     allGames.forEach((g, index) => {
@@ -511,12 +347,9 @@ function saveState() {
         homeTeam: homeTeamInput.value,
         awayTeam: awayTeamInput.value,
         games: allGames,
-        tvModeForced: tvModeForced,
-        hiVisForced: hiVisForced
+        tvModeForced: tvModeForced
     };
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (e) {}
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
 }
 
 /* LOAD STATE */
@@ -525,22 +358,13 @@ function loadState() {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return;
         const state = JSON.parse(raw);
-        if (!state || !Array.isArray(state.games) || state.games.length === 0) return;
+        if (!state || !Array.isArray(state.games)) return;
 
-        const total = state.games.length;
-        matchTypeSelect.value = state.matchType === "8" ? "8" : "6";
+        matchTypeSelect.value = state.matchType || "6";
 
-        createGameData(total);
+        createGameData(state.games.length);
         for (let i = 0; i < allGames.length; i++) {
-            if (state.games[i]) {
-                allGames[i] = {
-                    rink: allGames[i].rink,
-                    homePlayers: state.games[i].homePlayers || "",
-                    awayPlayers: state.games[i].awayPlayers || "",
-                    homeScore: state.games[i].homeScore || "",
-                    awayScore: state.games[i].awayScore || ""
-                };
-            }
+            allGames[i] = state.games[i];
         }
 
         renderGamesOnce();
@@ -552,19 +376,15 @@ function loadState() {
         tvModeBtn.classList.toggle("active", tvModeForced);
         applyTVMode();
 
-        hiVisForced = !!state.hiVisForced;
-        document.body.classList.toggle("high-vis", hiVisForced);
-        hiVisBtn.classList.toggle("active", hiVisForced);
-
         allGames.forEach((g, index) => {
             const homeP = gamesContainer.querySelector(`input[data-index="${index}"][data-field="homePlayers"]`);
             const awayP = gamesContainer.querySelector(`input[data-index="${index}"][data-field="awayPlayers"]`);
             const homeS = gamesContainer.querySelector(`input[data-index="${index}"][data-field="homeScore"]`);
             const awayS = gamesContainer.querySelector(`input[data-index="${index}"][data-field="awayScore"]`);
-            if (homeP) homeP.value = g.homePlayers || "";
-            if (awayP) awayP.value = g.awayPlayers || "";
-            if (homeS) homeS.value = g.homeScore || "";
-            if (awayS) awayS.value = g.awayScore || "";
+            if (homeP) homeP.value = g.homePlayers;
+            if (awayP) awayP.value = g.awayPlayers;
+            if (homeS) homeS.value = g.homeScore;
+            if (awayS) awayS.value = g.awayScore;
         });
 
         updateTotals();
@@ -578,10 +398,8 @@ function attachInputListeners() {
         input.addEventListener("input", e => {
             const idx = parseInt(e.target.dataset.index);
             const field = e.target.dataset.field;
-            if (!isNaN(idx) && field && allGames[idx]) {
-                allGames[idx][field] = e.target.value;
-            }
-            if (field && field.includes("Score")) updateTotals();
+            allGames[idx][field] = e.target.value;
+            if (field.includes("Score")) updateTotals();
             saveState();
         });
     });
@@ -610,8 +428,6 @@ function applyTVMode() {
 }
 
 /* EVENTS */
-
-/* Match type change */
 matchTypeSelect.addEventListener("change", () => {
     const total = parseInt(matchTypeSelect.value);
     createGameData(total);
@@ -621,7 +437,6 @@ matchTypeSelect.addEventListener("change", () => {
     saveState();
 });
 
-/* Hide/show setup panel */
 hideSetupBtn.addEventListener("click", () => {
     setupPanel.style.display = "none";
     showSetupBtn.style.display = "block";
@@ -632,18 +447,13 @@ showSetupBtn.addEventListener("click", () => {
     showSetupBtn.style.display = "none";
 });
 
-/* Reset scores */
 resetScoresBtn.addEventListener("click", () => {
     allGames.forEach(g => { g.homeScore = ""; g.awayScore = ""; g.homePlayers = ""; g.awayPlayers = ""; });
-    const scoreInputs = gamesContainer.querySelectorAll(".score-input");
-    const textInputs = gamesContainer.querySelectorAll(".text-input");
-    scoreInputs.forEach(i => i.value = "");
-    textInputs.forEach(i => i.value = "");
+    renderGamesOnce();
     updateTotals();
     saveState();
 });
 
-/* Fullscreen */
 fullscreenBtn.addEventListener("click", () => {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(() => {});
@@ -652,7 +462,6 @@ fullscreenBtn.addEventListener("click", () => {
     }
 });
 
-/* TV Mode toggle */
 tvModeBtn.addEventListener("click", () => {
     tvModeForced = !tvModeForced;
     tvModeBtn.classList.toggle("active", tvModeForced);
@@ -660,15 +469,6 @@ tvModeBtn.addEventListener("click", () => {
     saveState();
 });
 
-/* High Visibility toggle */
-hiVisBtn.addEventListener("click", () => {
-    hiVisForced = !hiVisForced;
-    document.body.classList.toggle("high-vis", hiVisForced);
-    hiVisBtn.classList.toggle("active", hiVisForced);
-    saveState();
-});
-
-/* Info panel */
 infoButton.addEventListener("click", () => {
     infoPanel.style.display = infoPanel.style.display === "block" ? "none" : "block";
 });
@@ -677,15 +477,8 @@ document.addEventListener("click", e => {
     if (!infoPanel.contains(e.target) && e.target !== infoButton) infoPanel.style.display = "none";
 });
 
-/* Live team name updates */
-homeTeamInput.addEventListener("input", () => {
-    updateTotals();
-    saveState();
-});
-awayTeamInput.addEventListener("input", () => {
-    updateTotals();
-    saveState();
-});
+homeTeamInput.addEventListener("input", () => { updateTotals(); saveState(); });
+awayTeamInput.addEventListener("input", () => { updateTotals(); saveState(); });
 
 /* INIT */
 function init() {
@@ -700,4 +493,3 @@ init();
 
 </body>
 </html>
-
