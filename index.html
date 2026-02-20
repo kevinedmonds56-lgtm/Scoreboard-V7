@@ -379,7 +379,24 @@ body.high-vis #infoPanel {
         font-size: 0.9rem;
     }
 }
+/* ---------------------------------------------------------
+   PATCH 7.5.2b — Independent Game List Scrolling
+   Ensures 6 games always fit by allowing only the game list
+   to scroll, not the whole page.
+--------------------------------------------------------- */
 
+main {
+    flex: 1;
+    overflow-y: hidden; /* stop whole page scrolling */
+    display: flex;
+    flex-direction: column;
+}
+
+#gamesContainer {
+    flex: 1;
+    overflow-y: auto;   /* scroll only the games */
+    padding-right: 4px; /* avoid clipping on iPhone */
+}
 </style>
 </head>
 <body>
@@ -683,3 +700,4 @@ init();
 
 </body>
 </html>
+
