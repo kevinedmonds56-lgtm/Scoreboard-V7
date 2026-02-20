@@ -343,6 +343,43 @@ body.high-vis #infoPanel {
     background: #000000;
     border-color: #ffff00;
 }
+
+/* ---------------------------------------------------------
+   PATCH 7.5.2a — Mobile Header Compression
+--------------------------------------------------------- */
+@media (max-width: 600px) {
+
+    header {
+        padding: 4px 6px;
+        gap: 6px;
+    }
+
+    header h1 {
+        font-size: 1rem;
+    }
+
+    header .header-right button {
+        padding: 4px 6px;
+        font-size: 0.75rem;
+    }
+
+    #setupPanel {
+        padding: 6px;
+        gap: 6px;
+    }
+
+    .setup-row label {
+        min-width: 70px;
+        font-size: 0.85rem;
+    }
+
+    .setup-row input,
+    .setup-row select {
+        padding: 4px;
+        font-size: 0.9rem;
+    }
+}
+
 </style>
 </head>
 <body>
@@ -396,6 +433,7 @@ body.high-vis #infoPanel {
     - TV Mode<br>
     - High Visibility Mode<br>
 </div>
+
 <script>
 let allGames = [];
 let tvModeForced = false;
