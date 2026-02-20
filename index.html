@@ -1,9 +1,8 @@
-<!-- BLOCK 1 / 2 : FULL V7.5 SCOREBOARD (HTML + CSS + START OF JS) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cradley Heath Bowls Scoreboard V7.5.0</title>
+    <title>Cradley Heath Bowls Scoreboard V7.5.2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -17,6 +16,7 @@
     --accent-color: #ffd700;
 }
 
+/* Base reset */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
 
@@ -25,13 +25,22 @@ body {
     background: radial-gradient(circle at top, #145214, #021902);
     color: var(--text-color);
     min-height: 100vh;
-    overflow-y: auto;
-overflow-x: hidden;
     display: flex;
     flex-direction: column;
+
+    /* PATCH 7.5.1 – allow vertical scroll if needed */
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-/* PATCH 4 START - Header layout improvements */
+/* PATCH 7.5.1 – ensure scroll on short viewports */
+@media (max-height: 750px) {
+    body {
+        overflow-y: auto;
+    }
+}
+
+/* Header */
 header {
     padding: 8px 12px;
     background: #022502;
@@ -54,23 +63,23 @@ header .header-right {
     flex-wrap: wrap;
 }
 
-#tvModeBtn {
+header button {
     padding: 6px 10px;
     border-radius: 4px;
     border: 1px solid var(--panel-border);
     background: #0b3d0b;
     color: var(--text-color);
     cursor: pointer;
+    font-size: 0.9rem;
 }
 
-#tvModeBtn.active {
+header button.active {
     background: var(--accent-color);
     color: #000;
     font-weight: bold;
 }
-/* PATCH 4 END - Header layout improvements */
 
-/* SETUP PANEL */
+/* Setup Panel */
 #setupPanel {
     background: #0b3d0b;
     border-bottom: 2px solid var(--panel-border);
@@ -88,6 +97,7 @@ header .header-right {
 
 .setup-row label {
     min-width: 90px;
+    font-weight: 600;
 }
 
 .setup-row input,
@@ -98,6 +108,13 @@ header .header-right {
     border: 1px solid var(--panel-border);
     background: #e8ffe8;
     color: #000;
+}
+
+/* PATCH 7.5.2 – larger, clearer team name inputs */
+#homeTeamInput,
+#awayTeamInput {
+    font-size: 1.1rem;
+    font-weight: 600;
 }
 
 #hideSetupBtn, #showSetupBtn, #resetScoresBtn, #fullscreenBtn {
@@ -117,7 +134,7 @@ header .header-right {
     z-index: 1000;
 }
 
-/* MAIN */
+/* Main */
 main {
     flex: 1;
     overflow-y: auto;
@@ -133,7 +150,7 @@ main {
     gap: 8px;
 }
 
-/* GAME BLOCKS */
+/* Game Blocks */
 .game-block {
     background: var(--panel-bg);
     border: 2px solid var(--panel-border);
@@ -151,6 +168,7 @@ main {
     text-align: center;
 }
 
+/* PATCH 7.5.2 – larger text inside player boxes */
 .text-input {
     width: 100%;
     padding: 4px;
@@ -158,18 +176,22 @@ main {
     border: 1px solid var(--panel-border);
     background: #e8ffe8;
     color: #000;
+    font-size: 1.05rem;
+    line-height: 1.2;
 }
 
+/* PATCH 7.5.2 – larger, bolder scores */
 .score-input {
     width: 60px;
     padding: 4px;
-    font-size: 1.2rem;
+    font-size: 1.35rem;
     font-weight: bold;
     text-align: center;
     border-radius: 4px;
     border: 1px solid var(--panel-border);
     background: var(--score-bg);
     color: var(--score-text);
+    line-height: 1.2;
 }
 
 .team-row {
@@ -178,15 +200,16 @@ main {
     gap: 6px;
 }
 
-/* TOTALS */
+/* Totals */
 #totalsBar {
     border-top: 1px solid var(--panel-border);
     padding-top: 6px;
     text-align: center;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
 }
 
-/* INFO BUTTON */
+/* Info Button */
 #infoButton {
     position: fixed;
     right: 10px;
@@ -215,7 +238,7 @@ main {
     border: 1px solid #ffffff;
 }
 
-/* RESPONSIVE GRID */
+/* Responsive Grid */
 @media (min-width: 900px) {
     #gamesContainer { grid-template-columns: repeat(2, 1fr); }
 }
@@ -224,36 +247,16 @@ main {
     #gamesContainer { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* PATCH 5 START - Mobile height optimisation */
+/* Mobile optimisation */
 @media (max-width: 600px) {
-    header {
-        padding: 4px 8px;
-    }
-
-    .game-block {
-        padding: 6px;
-        gap: 4px;
-    }
-
-    .text-input,
-    .score-input {
-        padding: 3px;
-    }
-
-    #totalsBar {
-        padding-top: 2px;
-        font-size: 0.9rem;
-    }
-
-    main {
-        padding: 4px;
-        gap: 4px;
-    }
+    header { padding: 4px 8px; }
+    .game-block { padding: 6px; gap: 4px; }
+    .text-input, .score-input { padding: 3px; }
+    #totalsBar { padding-top: 2px; font-size: 0.9rem; }
+    main { padding: 4px; gap: 4px; }
 }
-/* PATCH 5 END - Mobile height optimisation */
 
-/* TV MODE */
-/* PATCH 3 START - Improved TV mode behaviour */
+/* TV Mode */
 @media (min-width: 1000px) {
     body.tv-6 #gamesContainer { grid-template-columns: repeat(3, 1fr); }
     body.tv-8 #gamesContainer { grid-template-columns: repeat(4, 1fr); }
@@ -293,15 +296,61 @@ main {
         padding: 14px 0;
     }
 }
-/* PATCH 3 END - Improved TV mode behaviour */
+
+/* HIGH VISIBILITY MODE */
+body.high-vis {
+    background: #000000;
+}
+
+body.high-vis .game-block {
+    background: #003300;
+    border-color: #ffff00;
+}
+
+body.high-vis .game-title {
+    color: #ffff00;
+    text-shadow: 0 0 4px #000;
+}
+
+body.high-vis .text-input {
+    background: #ffffff;
+    color: #000000;
+    border-color: #ffff00;
+    font-weight: 600;
+}
+
+body.high-vis .score-input {
+    background: #ffffff;
+    color: #000000;
+    border-color: #ff0000;
+    font-weight: 700;
+}
+
+body.high-vis #totalsBar {
+    color: #ffff00;
+    font-weight: 700;
+}
+
+body.high-vis header {
+    background: #001900;
+}
+
+body.high-vis #setupPanel {
+    background: #002200;
+}
+
+body.high-vis #infoPanel {
+    background: #000000;
+    border-color: #ffff00;
+}
 </style>
 </head>
-
 <body>
 
 <header>
-    <h1>Cradley Heath Bowls Scoreboard V7.5.0</h1>
+    <h1>Cradley Heath Bowls Scoreboard V7.5.2</h1>
     <div class="header-right">
+        <button id="hiVisBtn">High Vis</button>
         <button id="tvModeBtn">TV Mode</button>
     </div>
 </header>
@@ -341,15 +390,16 @@ main {
 
 <button id="infoButton">i</button>
 <div id="infoPanel">
-    <strong>Scoreboard V7.5.0</strong><br>
+    <strong>Scoreboard V7.5.2</strong><br>
     - 6/8 Game Selector<br>
     - Local Save & Restore<br>
     - TV Mode<br>
+    - High Visibility Mode<br>
 </div>
-
 <script>
 let allGames = [];
 let tvModeForced = false;
+let hiVisForced = false;
 
 const matchTypeSelect = document.getElementById("matchType");
 const gamesContainer = document.getElementById("gamesContainer");
@@ -364,8 +414,9 @@ const setupPanel = document.getElementById("setupPanel");
 const infoButton = document.getElementById("infoButton");
 const infoPanel = document.getElementById("infoPanel");
 const tvModeBtn = document.getElementById("tvModeBtn");
+const hiVisBtn = document.getElementById("hiVisBtn");
 
-const STORAGE_KEY = "chb_scoreboard_v75";
+const STORAGE_KEY = "chb_scoreboard_v75_2";
 
 /* GAME DATA */
 function createGameData(total) {
@@ -398,24 +449,22 @@ function renderGamesOnce() {
     attachInputListeners();
 }
 
-/* PATCH 6 START - Save state to localStorage */
+/* SAVE STATE */
 function saveState() {
     const state = {
         matchType: matchTypeSelect.value,
         homeTeam: homeTeamInput.value,
         awayTeam: awayTeamInput.value,
         games: allGames,
-        tvModeForced: tvModeForced
+        tvModeForced: tvModeForced,
+        hiVisForced: hiVisForced
     };
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (e) {
-        // ignore storage errors
-    }
+    } catch (e) {}
 }
-/* PATCH 6 END - Save state to localStorage */
 
-/* PATCH 7 START - Load state from localStorage */
+/* LOAD STATE */
 function loadState() {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -448,6 +497,10 @@ function loadState() {
         tvModeBtn.classList.toggle("active", tvModeForced);
         applyTVMode();
 
+        hiVisForced = !!state.hiVisForced;
+        document.body.classList.toggle("high-vis", hiVisForced);
+        hiVisBtn.classList.toggle("active", hiVisForced);
+
         allGames.forEach((g, index) => {
             const homeP = gamesContainer.querySelector(`input[data-index="${index}"][data-field="homePlayers"]`);
             const awayP = gamesContainer.querySelector(`input[data-index="${index}"][data-field="awayPlayers"]`);
@@ -460,11 +513,8 @@ function loadState() {
         });
 
         updateTotals();
-    } catch (e) {
-        // ignore parse errors
-    }
+    } catch (e) {}
 }
-/* PATCH 7 END - Load state from localStorage */
 
 /* INPUT LISTENERS */
 function attachInputListeners() {
@@ -495,7 +545,6 @@ function updateTotals() {
 }
 
 /* TV MODE */
-/* PATCH 3 START - Improved TV mode behaviour */
 function applyTVMode() {
     document.body.classList.remove("tv-6", "tv-8");
     const total = parseInt(matchTypeSelect.value);
@@ -504,11 +553,10 @@ function applyTVMode() {
         if (total === 8) document.body.classList.add("tv-8");
     }
 }
-/* PATCH 3 END - Improved TV mode behaviour */
 
 /* EVENTS */
 
-/* PATCH 2 START - Match type change resets all inputs except team names, with save */
+/* Match type change */
 matchTypeSelect.addEventListener("change", () => {
     const total = parseInt(matchTypeSelect.value);
     createGameData(total);
@@ -517,8 +565,8 @@ matchTypeSelect.addEventListener("change", () => {
     applyTVMode();
     saveState();
 });
-/* PATCH 2 END - Match type change resets all inputs except team names, with save */
 
+/* Hide/show setup panel */
 hideSetupBtn.addEventListener("click", () => {
     setupPanel.style.display = "none";
     showSetupBtn.style.display = "block";
@@ -529,6 +577,7 @@ showSetupBtn.addEventListener("click", () => {
     showSetupBtn.style.display = "none";
 });
 
+/* Reset scores */
 resetScoresBtn.addEventListener("click", () => {
     allGames.forEach(g => { g.homeScore = ""; g.awayScore = ""; g.homePlayers = ""; g.awayPlayers = ""; });
     const scoreInputs = gamesContainer.querySelectorAll(".score-input");
@@ -539,7 +588,7 @@ resetScoresBtn.addEventListener("click", () => {
     saveState();
 });
 
-/* Optional: Fullscreen button */
+/* Fullscreen */
 fullscreenBtn.addEventListener("click", () => {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(() => {});
@@ -548,6 +597,7 @@ fullscreenBtn.addEventListener("click", () => {
     }
 });
 
+/* TV Mode toggle */
 tvModeBtn.addEventListener("click", () => {
     tvModeForced = !tvModeForced;
     tvModeBtn.classList.toggle("active", tvModeForced);
@@ -555,6 +605,15 @@ tvModeBtn.addEventListener("click", () => {
     saveState();
 });
 
+/* High Visibility toggle */
+hiVisBtn.addEventListener("click", () => {
+    hiVisForced = !hiVisForced;
+    document.body.classList.toggle("high-vis", hiVisForced);
+    hiVisBtn.classList.toggle("active", hiVisForced);
+    saveState();
+});
+
+/* Info panel */
 infoButton.addEventListener("click", () => {
     infoPanel.style.display = infoPanel.style.display === "block" ? "none" : "block";
 });
@@ -563,7 +622,7 @@ document.addEventListener("click", e => {
     if (!infoPanel.contains(e.target) && e.target !== infoButton) infoPanel.style.display = "none";
 });
 
-/* PATCH 1 START - Live team name updates + save */
+/* Live team name updates */
 homeTeamInput.addEventListener("input", () => {
     updateTotals();
     saveState();
@@ -572,7 +631,6 @@ awayTeamInput.addEventListener("input", () => {
     updateTotals();
     saveState();
 });
-/* PATCH 1 END - Live team name updates + save */
 
 /* INIT */
 function init() {
@@ -584,6 +642,6 @@ function init() {
 }
 init();
 </script>
+
 </body>
 </html>
-
